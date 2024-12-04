@@ -1,49 +1,43 @@
 package com.exemplo.agenciaviagem.service;
 
+import com.exemplo.agenciaviagem.dto.DestinationCreateDTO;
+import com.exemplo.agenciaviagem.dto.DestinationResponseDTO;
 import com.exemplo.agenciaviagem.model.Destination;
+import com.exemplo.agenciaviagem.repository.DestinationRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class DestinationService {
-    private final List<Destination> destinations = new ArrayList<>();
 
-    
-    public Destination addDestination(Destination destination) {
-        destination.setId((long) (destinations.size() + 1));
-        destinations.add(destination);
-        return destination;
+    private final DestinationRepository destinationRepository;
+
+    public DestinationService(DestinationRepository destinationRepository) {
+        this.destinationRepository = destinationRepository;
     }
 
-    
-    public List<Destination> getAllDestinations() {
-        return destinations;
+    public DestinationResponseDTO addDestination(DestinationCreateDTO dto) {
+        Destination destination = new Destination();
+        destination.setName(dto.getName());
+        destination.setLocation(dto.getLocation());
+        destination.setDescription(dto.getDescription());
+        destination = destinationRepository.save(destination);
+        return mapToResponseDTO(destination);
     }
 
-    
-    public Optional<Destination> findDestinationByNameOrLocation(String nameOrLocation) {
-        return destinations.stream()
-            .filter(d -> d.getName().equalsIgnoreCase(nameOrLocation) || d.getLocation().equalsIgnoreCase(nameOrLocation))
-            .findFirst();
+    public List<DestinationResponseDTO> getAllDestinations() {
+        return destinationRepository.findAll().stream()
+                .map(this::mapToResponseDTO)
+                .collect(Collectors.toList());
     }
 
-   
-    public Optional<Destination> getDestinationDetails(Long id) {
-        return destinations.stream().filter(d -> d.getId().equals(id)).findFirst();
-    }
-
-    
-    public Optional<Destination> rateDestination(Long id, int rating) {
-        Optional<Destination> destinationOptional = getDestinationDetails(id);
-        destinationOptional.ifPresent(destination -> destination.addRating(rating));
-        return destinationOptional;
-    }
-
-    
-    public boolean deleteDestination(Long id) {
-        return destinations.removeIf(d -> d.getId().equals(id));
+    private DestinationResponseDTO mapToResponseDTO(Destination destination) {
+        DestinationResponseDTO dto = new DestinationResponseDTO();
+        dto.setId(destination.getId());
+        dto.setName(destination.getName());
+        dto.setLocation(destination.getLocation());
+        return dto;
     }
 }

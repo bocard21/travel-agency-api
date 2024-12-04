@@ -1,25 +1,33 @@
 package com.exemplo.agenciaviagem.model;
 
+import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import java.time.LocalDateTime;
+
+@Entity
+@Table(name = "destinations")
 public class Destination {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false)
     private String name;
+
+    @Column(nullable = false)
     private String location;
+
     private String description;
-    private double rating;
-    private int ratingCount;
 
-    public Destination() {}
+    @CreationTimestamp
+    private LocalDateTime createdAt;
 
-    
-    public Destination(String name, String location, String description) {
-        this.name = name;
-        this.location = location;
-        this.description = description;
-        this.rating = 0.0;
-        this.ratingCount = 0;
-    }
+    @UpdateTimestamp
+    private LocalDateTime updatedAt;
 
-    
     public Long getId() {
         return id;
     }
@@ -50,27 +58,5 @@ public class Destination {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public double getRating() {
-        return rating;
-    }
-
-    public void setRating(double rating) {
-        this.rating = rating;
-    }
-
-    public int getRatingCount() {
-        return ratingCount;
-    }
-
-    public void setRatingCount(int ratingCount) {
-        this.ratingCount = ratingCount;
-    }
-
-    
-    public void addRating(int newRating) {
-        this.rating = ((this.rating * this.ratingCount) + newRating) / (this.ratingCount + 1);
-        this.ratingCount++;
     }
 }
